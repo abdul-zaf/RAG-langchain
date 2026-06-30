@@ -1,0 +1,42 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ollama-pull:
+    image: ollama/ollama
+    container_name: ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["ollama", "pull", "llama3.2"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: "no"
+
+  app:
+    build: .
+    container_name: rag-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./faiss_store:/app/faiss_store
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

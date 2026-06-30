@@ -1,0 +1,6 @@
+faiss_store/
+results.txt
+.github/
+__pycache__/
+*.pyc
+.env

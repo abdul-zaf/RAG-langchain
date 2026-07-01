@@ -17,6 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check secrets
+        run: |
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then echo "DOCKERHUB_USERNAME is empty"; else echo "DOCKERHUB_USERNAME is set"; fi
+          if [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then echo "DOCKERHUB_TOKEN is empty"; else echo "DOCKERHUB_TOKEN is set"; fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
